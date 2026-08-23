@@ -1,8 +1,10 @@
 # Fortify 2.2 CMake wrapper
 
-This directory builds Simon P. Bullen's Fortify 2.2 as C without changing or
-renaming any file from the original distribution.  The seven original files
-are kept together in `original/`.
+This directory builds Simon P. Bullen's Fortify 2.2 as C without changing
+any file from the original distribution, except to rename the original
+header files as lowercase, since that is how they are included in the
+original source files.  The seven original files are kept together in
+`original/`.
 
 Projects should include:
 
