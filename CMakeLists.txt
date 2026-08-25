@@ -16,7 +16,7 @@ add_library(Fortify STATIC
 set_source_files_properties(original/FORTIFY.CXX PROPERTIES
     LANGUAGE C
     COMPILE_DEFINITIONS
-        "Fortify_Allocate=Fortify22_Allocate;Fortify_SetOutputFunc=Fortify22_SetOutputFunc;Fortify_malloc=Fortify22_malloc;Fortify_realloc=Fortify22_realloc;Fortify_calloc=Fortify22_calloc;Fortify_free=Fortify22_free"
+        "Fortify_Allocate=Fortify22_Allocate;Fortify_SetAllocateFailRate=Fortify22_SetAllocateFailRate;Fortify_SetOutputFunc=Fortify22_SetOutputFunc;Fortify_malloc=Fortify22_malloc;Fortify_realloc=Fortify22_realloc;Fortify_calloc=Fortify22_calloc;Fortify_free=Fortify22_free"
 )
 
 target_compile_definitions(Fortify

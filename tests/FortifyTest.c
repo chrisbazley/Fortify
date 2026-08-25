@@ -62,6 +62,13 @@ int main(void)
 
     assert(Fortify_AllowAllocate(__FILE__, __LINE__));
 
+    /* The name declared by the original header and the name used by its
+     * documentation and implementation control the same setting. */
+    assert(Fortify_SetAllocateFailRate(100) == old_rate);
+    assert(Fortify_SetFailRate(0) == 100);
+    assert(Fortify_SetFailRate(100) == 0);
+    assert(Fortify_SetAllocateFailRate(old_rate) == 100);
+
     assert(Fortify_CheckAllMemory() == 0);
     return EXIT_SUCCESS;
 }

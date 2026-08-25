@@ -16,9 +16,7 @@ void *Fortify22_calloc(size_t count, size_t size, const char *file,
 void Fortify22_free(void *ptr, const char *file, unsigned long line);
 Fortify_OutputFuncPtr Fortify22_SetOutputFunc(Fortify_OutputFuncPtr output);
 
-/* FORTIFY.CXX defines this name, although FORTIFY.H declares
- * Fortify_SetFailRate instead. */
-int Fortify_SetAllocateFailRate(int percent);
+int Fortify22_SetAllocateFailRate(int percent);
 
 static unsigned long allocation_limit = ULONG_MAX;
 static unsigned long allocation_count;
@@ -85,7 +83,7 @@ static int allocation_permitted(size_t size, unsigned char allocator,
     return permitted;
 }
 
-int Fortify_SetFailRate(int percent)
+int Fortify_SetAllocateFailRate(int percent)
 {
     int old = allocation_fail_rate;
 
@@ -95,9 +93,14 @@ int Fortify_SetFailRate(int percent)
      * Fortify_AllowAllocate and actual allocations share one decision
      * mechanism.  Keep the unmodified implementation's rate at zero to
      * prevent an allocation from being tested a second time. */
-    (void)Fortify_SetAllocateFailRate(0);
+    (void)Fortify22_SetAllocateFailRate(0);
 
     return old;
+}
+
+int Fortify_SetFailRate(int percent)
+{
+    return Fortify_SetAllocateFailRate(percent);
 }
 
 void Fortify_SetNumAllocationsLimit(unsigned long limit)

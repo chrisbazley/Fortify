@@ -16,6 +16,11 @@ extern "C" {
 
 #ifdef FORTIFY
 
+/* Fortify 2.2 documents and defines this name, although its original header
+ * declares Fortify_SetFailRate instead.  The wrapper provides both names with
+ * identical behaviour. */
+int Fortify_SetAllocateFailRate(int percent);
+
 /* Permit at most limit allocation attempts after this call.  ULONG_MAX
  * removes the limit. */
 void Fortify_SetNumAllocationsLimit(unsigned long limit);
