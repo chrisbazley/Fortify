@@ -20,6 +20,10 @@ extern "C" {
  * removes the limit. */
 void Fortify_SetNumAllocationsLimit(unsigned long limit);
 
+/* Apply the same fault-injection decision as an intercepted allocation
+ * without allocating a Fortify memory block. */
+int Fortify_AllowAllocate(const char *file, unsigned long line);
+
 #endif
 
 #ifdef __cplusplus
