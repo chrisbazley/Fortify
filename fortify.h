@@ -33,8 +33,6 @@
 extern "C" {
 #endif
 
-#ifdef FORTIFY
-
 _Optional void *Fortify_Allocate(size_t size, unsigned char allocator,
                                  const char *file, unsigned long line);
 
@@ -59,8 +57,6 @@ void Fortify_SetNumAllocationsLimit(unsigned long limit);
 /* Apply the same fault-injection decision as an intercepted allocation
  * without allocating a Fortify memory block. */
 int Fortify_AllowAllocate(const char *file, unsigned long line);
-
-#endif
 
 #ifdef __cplusplus
 }
