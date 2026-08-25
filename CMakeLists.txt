@@ -5,13 +5,13 @@ project(Fortify VERSION 2.2 LANGUAGES C)
 include(CTest)
 
 add_library(Fortify STATIC
-    Fortify.c
+    fortify.c
     original/FORTIFY.CXX
 )
 
 # FORTIFY.CXX is deliberately compiled as C, as directed by FORTIFY.DOC, but
 # is not renamed.  Rename its allocation entry points for the private copy so
-# that Fortify.c can add allocation-count fault injection without changing the
+# that fortify.c can add allocation-count fault injection without changing the
 # original source file.
 set_source_files_properties(original/FORTIFY.CXX PROPERTIES
     LANGUAGE C

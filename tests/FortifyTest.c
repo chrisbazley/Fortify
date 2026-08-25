@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "Fortify.h"
+#include "fortify.h"
 
 #ifdef FORTIFY_WARN_ON_FALSE_FAIL
 static char output_buffer[256];

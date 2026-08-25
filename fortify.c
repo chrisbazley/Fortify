@@ -1,5 +1,5 @@
 #define __FORTIFY_C__
-#include "Fortify.h"
+#include "fortify.h"
 #undef __FORTIFY_C__
 
 #include <limits.h>
