@@ -122,8 +122,8 @@ Fortify_OutputFuncPtr Fortify_SetOutputFunc(Fortify_OutputFuncPtr output)
     return old;
 }
 
-void *Fortify_Allocate(size_t size, unsigned char allocator,
-                       const char *file, unsigned long line)
+_Optional void *Fortify_Allocate(size_t size, unsigned char allocator,
+                                 const char *file, unsigned long line)
 {
     if (!allocation_permitted(size, allocator, file, line))
         return NULL;
@@ -131,7 +131,8 @@ void *Fortify_Allocate(size_t size, unsigned char allocator,
     return Fortify22_Allocate(size, allocator, file, line);
 }
 
-void *Fortify_malloc(size_t size, const char *file, unsigned long line)
+_Optional void *Fortify_malloc(size_t size, const char *file,
+                               unsigned long line)
 {
     if (!allocation_permitted(size, Fortify_Allocator_malloc, file, line))
         return NULL;
@@ -139,8 +140,8 @@ void *Fortify_malloc(size_t size, const char *file, unsigned long line)
     return Fortify22_malloc(size, file, line);
 }
 
-void *Fortify_calloc(size_t count, size_t size, const char *file,
-                     unsigned long line)
+_Optional void *Fortify_calloc(size_t count, size_t size, const char *file,
+                               unsigned long line)
 {
     if (!allocation_permitted(count * size, Fortify_Allocator_calloc,
                               file, line))
@@ -149,17 +150,17 @@ void *Fortify_calloc(size_t count, size_t size, const char *file,
     return Fortify22_calloc(count, size, file, line);
 }
 
-void *Fortify_realloc(void *ptr, size_t size, const char *file,
-                      unsigned long line)
+_Optional void *Fortify_realloc(_Optional void *ptr, size_t size,
+                                const char *file, unsigned long line)
 {
     if (size != 0 &&
         !allocation_permitted(size, Fortify_Allocator_realloc, file, line))
         return NULL;
 
-    return Fortify22_realloc(ptr, size, file, line);
+    return Fortify22_realloc((void *)ptr, size, file, line);
 }
 
-void Fortify_free(void *ptr, const char *file, unsigned long line)
+void Fortify_free(_Optional void *ptr, const char *file, unsigned long line)
 {
-    Fortify22_free(ptr, file, line);
+    Fortify22_free((void *)ptr, file, line);
 }

@@ -16,8 +16,8 @@ static void capture_output(const char *string)
 
 int main(void)
 {
-    void *first;
-    void *second;
+    _Optional void *first;
+    _Optional void *second;
     int old_rate;
 
     Fortify_SetNumAllocationsLimit(1);
