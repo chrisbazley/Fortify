@@ -31,6 +31,21 @@ int main(void)
     assert(strcmp(&*string, "test") == 0);
     free(string);
 
+    string = Fortify_strndup("testing", 4, __FILE__, __LINE__);
+    assert(string != NULL);
+    assert(strcmp(&*string, "test") == 0);
+    Fortify_free_sized(string, 5, __FILE__, __LINE__);
+
+    first = Fortify_aligned_alloc(sizeof(double), sizeof(double),
+                                  __FILE__, __LINE__);
+    assert(first != NULL);
+    Fortify_free_aligned_sized(first, sizeof(double), sizeof(double),
+                               __FILE__, __LINE__);
+
+    first = Fortify_reallocarray(NULL, 2, 3, __FILE__, __LINE__);
+    assert(first != NULL);
+    free(first);
+
     Fortify_SetNumAllocationsLimit(1);
     first = malloc(1);
     second = malloc(1);

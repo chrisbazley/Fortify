@@ -32,6 +32,12 @@ block. When
 `FORTIFY_WARN_ON_FALSE_FAIL` is defined, wrapper-injected failures use the
 same diagnostic format and output function as the original implementation.
 
+The wrapper intercepts the complete ISO C allocation family selected by the
+consumer's language version. This includes `aligned_alloc` in C11 and
+`strndup`, `free_sized`, and `free_aligned_sized` in C23. It also intercepts
+`reallocarray` when POSIX.1-2024 is selected. Valid alignments stricter than
+Fortify's configured `FORTIFY_ALIGNMENT` are reported as allocation failures.
+
 The wrapper also intercepts ISO C stream operations so they participate in
 the same fault-injection sequence. `fortify.h` is the only header that
 normally needs to be included. Define `FORTIFY_NO_STDIO_INTERCEPTION` before

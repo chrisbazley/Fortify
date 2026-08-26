@@ -3,6 +3,7 @@
 #undef __FORTIFY_C__
 
 #include <limits.h>
+#include <errno.h>
 #include <stdio.h>
 
 /* Entry points compiled from the unmodified FORTIFY.CXX. */
@@ -33,6 +34,64 @@ _Optional char *Fortify_strdup(const char *string, const char *file,
         memcpy(&*copy, string, size);
 
     return copy;
+}
+
+_Optional char *Fortify_strndup(const char *string, size_t max_len,
+                                const char *file, unsigned long line)
+{
+    size_t len = 0;
+    _Optional char *copy;
+
+    while (len < max_len && string[len] != '\0')
+        ++len;
+
+    copy = Fortify_Allocate(len + 1, Fortify_Allocator_strdup, file, line);
+    if (copy != NULL) {
+        char *const dest = &*copy;
+
+        memcpy(dest, string, len);
+        dest[len] = '\0';
+    }
+
+    return copy;
+}
+
+_Optional void *Fortify_aligned_alloc(size_t alignment, size_t size,
+                                      const char *file, unsigned long line)
+{
+    if (alignment == 0 || (alignment & (alignment - 1)) != 0 ||
+        alignment > FORTIFY_ALIGNMENT)
+        return NULL;
+
+    return Fortify_Allocate(size, Fortify_Allocator_malloc, file, line);
+}
+
+_Optional void *Fortify_reallocarray(_Optional void *ptr, size_t count,
+                                     size_t size, const char *file,
+                                     unsigned long line)
+{
+    if (size != 0 && count > (size_t)-1 / size) {
+        errno = ENOMEM;
+        return NULL;
+    }
+
+    return Fortify_realloc(ptr, count * size, file, line);
+}
+
+void Fortify_free_sized(_Optional void *ptr, size_t size, const char *file,
+                        unsigned long line)
+{
+    (void)size;
+    Fortify_free(ptr, file, line);
+}
+
+void Fortify_free_aligned_sized(_Optional void *ptr, size_t alignment,
+                                size_t size, const char *file,
+                                unsigned long line)
+{
+    (void)alignment;
+    (void)size;
+    Fortify_free(ptr, file, line);
 }
 
 static void default_output(const char *string)
@@ -156,6 +215,9 @@ _Optional void *Fortify_malloc(size_t size, const char *file,
 _Optional void *Fortify_calloc(size_t count, size_t size, const char *file,
                                unsigned long line)
 {
+    if (size != 0 && count > (size_t)-1 / size)
+        return NULL;
+
     if (!allocation_permitted(count * size, Fortify_Allocator_calloc,
                               file, line))
         return NULL;

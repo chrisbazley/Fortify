@@ -46,6 +46,18 @@ void Fortify_free(_Optional void *uptr, const char *file,
                   unsigned long line);
 _Optional char *Fortify_strdup(const char *string, const char *file,
                                unsigned long line);
+_Optional void *Fortify_aligned_alloc(size_t alignment, size_t size,
+                                      const char *file, unsigned long line);
+_Optional char *Fortify_strndup(const char *string, size_t max_len,
+                                const char *file, unsigned long line);
+void Fortify_free_sized(_Optional void *ptr, size_t size, const char *file,
+                        unsigned long line);
+void Fortify_free_aligned_sized(_Optional void *ptr, size_t alignment,
+                                size_t size, const char *file,
+                                unsigned long line);
+_Optional void *Fortify_reallocarray(_Optional void *ptr, size_t count,
+                                     size_t size, const char *file,
+                                     unsigned long line);
 
 /* Fortify 2.2 documents and defines this name, although its original header
  * declares Fortify_SetFailRate instead.  The wrapper provides both names with
@@ -74,9 +86,46 @@ int Fortify_AllowAllocate(const char *file, unsigned long line);
 #endif
 
 #if defined(FORTIFY) && !defined(__FORTIFY_C__)
+#define FORTIFY_INTERCEPTED_MALLOC
+#define FORTIFY_INTERCEPTED_CALLOC
+#define FORTIFY_INTERCEPTED_REALLOC
+#define FORTIFY_INTERCEPTED_FREE
 #define FORTIFY_INTERCEPTED_STRDUP
 #undef strdup
 #define strdup(string) Fortify_strdup(string, __FILE__, __LINE__)
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define FORTIFY_INTERCEPTED_ALIGNED_ALLOC
+#undef aligned_alloc
+#define aligned_alloc(alignment, size) \
+    Fortify_aligned_alloc(alignment, size, __FILE__, __LINE__)
+#endif
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#define FORTIFY_INTERCEPTED_STRNDUP
+#undef strndup
+#define strndup(string, max_len) \
+    Fortify_strndup(string, max_len, __FILE__, __LINE__)
+#define FORTIFY_INTERCEPTED_FREE_SIZED
+#undef free_sized
+#define free_sized(ptr, size) \
+    Fortify_free_sized(ptr, size, __FILE__, __LINE__)
+#define FORTIFY_INTERCEPTED_FREE_ALIGNED_SIZED
+#undef free_aligned_sized
+#define free_aligned_sized(ptr, alignment, size) \
+    Fortify_free_aligned_sized(ptr, alignment, size, __FILE__, __LINE__)
+#elif (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L) || \
+      (defined(_POSIX_VERSION) && _POSIX_VERSION >= 200809L)
+#define FORTIFY_INTERCEPTED_STRNDUP
+#undef strndup
+#define strndup(string, max_len) \
+    Fortify_strndup(string, max_len, __FILE__, __LINE__)
+#endif
+#if (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 202405L) || \
+    (defined(_POSIX_VERSION) && _POSIX_VERSION >= 202405L)
+#define FORTIFY_INTERCEPTED_REALLOCARRAY
+#undef reallocarray
+#define reallocarray(ptr, count, size) \
+    Fortify_reallocarray(ptr, count, size, __FILE__, __LINE__)
+#endif
 #endif
 
 #endif
