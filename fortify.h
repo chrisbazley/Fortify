@@ -44,6 +44,8 @@ _Optional void *Fortify_calloc(size_t num, size_t size,
                                const char *file, unsigned long line);
 void Fortify_free(_Optional void *uptr, const char *file,
                   unsigned long line);
+_Optional char *Fortify_strdup(const char *string, const char *file,
+                               unsigned long line);
 
 /* Fortify 2.2 documents and defines this name, although its original header
  * declares Fortify_SetFailRate instead.  The wrapper provides both names with
@@ -69,6 +71,12 @@ int Fortify_AllowAllocate(const char *file, unsigned long line);
 #if defined(FORTIFY) && !defined(__FORTIFY_C__) && \
     !defined(FORTIFY_NO_STDIO_INTERCEPTION)
 #include "FortifyIO.h"
+#endif
+
+#if defined(FORTIFY) && !defined(__FORTIFY_C__)
+#define FORTIFY_INTERCEPTED_STRDUP
+#undef strdup
+#define strdup(string) Fortify_strdup(string, __FILE__, __LINE__)
 #endif
 
 #endif

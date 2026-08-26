@@ -22,6 +22,19 @@ static unsigned long allocation_limit = ULONG_MAX;
 static unsigned long allocation_count;
 static int allocation_fail_rate;
 
+_Optional char *Fortify_strdup(const char *string, const char *file,
+                               unsigned long line)
+{
+    const size_t size = strlen(string) + 1;
+    _Optional char *const copy = Fortify_Allocate(
+        size, Fortify_Allocator_strdup, file, line);
+
+    if (copy != NULL)
+        memcpy(&*copy, string, size);
+
+    return copy;
+}
+
 static void default_output(const char *string)
 {
     fprintf(stdout, "%s", string);

@@ -18,7 +18,18 @@ int main(void)
 {
     _Optional void *first;
     _Optional void *second;
+    _Optional char *string;
     int old_rate;
+
+    Fortify_SetNumAllocationsLimit(0);
+    string = strdup("test");
+    assert(string == NULL);
+
+    Fortify_SetNumAllocationsLimit(ULONG_MAX);
+    string = strdup("test");
+    assert(string != NULL);
+    assert(strcmp(&*string, "test") == 0);
+    free(string);
 
     Fortify_SetNumAllocationsLimit(1);
     first = malloc(1);
