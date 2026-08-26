@@ -32,26 +32,23 @@ jobs:
 
       - name: Configure
         run: >
-          cmake
-            -S "${{ github.workspace }}"
-            -B "${{ github.workspace }}/build"
-            -DCMAKE_BUILD_TYPE=Debug
-            -DCMAKE_C_COMPILER="${{ matrix.c_compiler }}"
-            -DBUILD_TESTING=ON
+          cmake -S "${{ github.workspace }}"
+          -B "${{ github.workspace }}/build"
+          -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_C_COMPILER="${{ matrix.c_compiler }}"
+          -DBUILD_TESTING=ON
 
       - name: Build
         run: >
-          cmake
-            --build "${{ github.workspace }}/build"
-            --config Debug
-            --parallel 2
+          cmake --build "${{ github.workspace }}/build"
+          --config Debug
+          --parallel 2
 
       - name: Test
         run: >
-          ctest
-            --test-dir "${{ github.workspace }}/build"
-            --build-config Debug
-            --output-on-failure
+          ctest --test-dir "${{ github.workspace }}/build"
+          --build-config Debug
+          --output-on-failure
 
   optional-clang:
     name: _Optional Clang

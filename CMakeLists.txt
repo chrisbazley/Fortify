@@ -19,6 +19,14 @@ set_source_files_properties(original/FORTIFY.CXX PROPERTIES
         "Fortify_Allocate=Fortify22_Allocate;Fortify_SetAllocateFailRate=Fortify22_SetAllocateFailRate;Fortify_SetOutputFunc=Fortify22_SetOutputFunc;Fortify_malloc=Fortify22_malloc;Fortify_realloc=Fortify22_realloc;Fortify_calloc=Fortify22_calloc;Fortify_free=Fortify22_free"
 )
 
+# LANGUAGE C selects the C compiler and C language flags, but GCC and Clang
+# still infer C++ from the original file's .CXX suffix unless told otherwise.
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    set_property(SOURCE original/FORTIFY.CXX APPEND_STRING PROPERTY
+        COMPILE_FLAGS " -x c"
+    )
+endif()
+
 target_compile_definitions(Fortify
     PRIVATE FORTIFY
     INTERFACE FORTIFY
