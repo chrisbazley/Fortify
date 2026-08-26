@@ -13,7 +13,7 @@ int main(void)
 
     assert(stream != NULL);
     assert(fwrite(data, sizeof data[0], sizeof data, &*stream) == sizeof data);
-    rewind(stream);
+    rewind(&*stream);
 
     Fortify_SetNumAllocationsLimit(0);
     assert(fread(buffer, sizeof buffer[0], sizeof buffer, &*stream) == 0);
