@@ -9,7 +9,7 @@ original source files.  The seven original files are kept together in
 Projects should include:
 
 ```c
-#include "Fortify.h"
+#include "fortify.h"
 ```
 
 When this directory is added with `add_subdirectory` or `FetchContent`, link a
@@ -31,3 +31,8 @@ injection as an intercepted allocation without creating a dummy Fortify memory
 block. When
 `FORTIFY_WARN_ON_FALSE_FAIL` is defined, wrapper-injected failures use the
 same diagnostic format and output function as the original implementation.
+
+The wrapper also intercepts ISO C stream operations so they participate in
+the same fault-injection sequence. `fortify.h` is the only header that
+normally needs to be included. Define `FORTIFY_NO_STDIO_INTERCEPTION` before
+including it if only memory-allocation interception is wanted.

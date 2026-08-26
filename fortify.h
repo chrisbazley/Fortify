@@ -62,4 +62,13 @@ int Fortify_AllowAllocate(const char *file, unsigned long line);
 }
 #endif
 
+/* Stream interception is part of the wrapper interface, but it must not be
+ * enabled while compiling Fortify itself. Define
+ * FORTIFY_NO_STDIO_INTERCEPTION before including this header to use Fortify
+ * solely for memory-allocation checking. */
+#if defined(FORTIFY) && !defined(__FORTIFY_C__) && \
+    !defined(FORTIFY_NO_STDIO_INTERCEPTION)
+#include "FortifyIO.h"
+#endif
+
 #endif

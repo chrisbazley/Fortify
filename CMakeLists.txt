@@ -6,6 +6,8 @@ include(CTest)
 
 add_library(Fortify STATIC
     fortify.c
+    FortifyIO.c
+    FortifyIO.h
     original/FORTIFY.CXX
 )
 
@@ -38,7 +40,7 @@ target_include_directories(Fortify
 )
 
 set_target_properties(Fortify PROPERTIES
-    C_STANDARD 90
+    C_STANDARD 99
     C_STANDARD_REQUIRED YES
     C_EXTENSIONS NO
     DEBUG_POSTFIX dbg
@@ -48,4 +50,8 @@ if(BUILD_TESTING)
     add_executable(FortifyTest tests/FortifyTest.c)
     target_link_libraries(FortifyTest PRIVATE Fortify)
     add_test(NAME FortifyTest COMMAND FortifyTest)
+
+    add_executable(FortifyIOTest tests/FortifyIOTest.c)
+    target_link_libraries(FortifyIOTest PRIVATE Fortify)
+    add_test(NAME FortifyIOTest COMMAND FortifyIOTest)
 endif()
