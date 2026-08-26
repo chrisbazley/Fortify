@@ -1,0 +1,132 @@
+name: CMake on multiple platforms
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: GCC
+            os: ubuntu-latest
+            c_compiler: gcc
+          - name: MSVC
+            os: windows-latest
+            c_compiler: cl
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: >
+          cmake
+            -S "${{ github.workspace }}"
+            -B "${{ github.workspace }}/build"
+            -DCMAKE_BUILD_TYPE=Debug
+            -DCMAKE_C_COMPILER="${{ matrix.c_compiler }}"
+            -DBUILD_TESTING=ON
+
+      - name: Build
+        run: >
+          cmake
+            --build "${{ github.workspace }}/build"
+            --config Debug
+            --parallel 2
+
+      - name: Test
+        run: >
+          ctest
+            --test-dir "${{ github.workspace }}/build"
+            --build-config Debug
+            --output-on-failure
+
+  optional-clang:
+    name: _Optional Clang
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+
+    env:
+      OPTIONAL_CLANG_TAG: v1.0.7-optional
+      OPTIONAL_CLANG_PLATFORM: linux-x86_64
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Download _Optional Clang
+        shell: bash
+        run: |
+          archive="clang+llvm-${OPTIONAL_CLANG_TAG}-${OPTIONAL_CLANG_PLATFORM}.tar.xz"
+          toolchain="$RUNNER_TEMP/optional-clang"
+
+          mkdir -p "$toolchain"
+
+          gh release download "$OPTIONAL_CLANG_TAG" \
+            --repo chrisbazley/llvm-project \
+            --pattern "$archive" \
+            --pattern "$archive.sha256" \
+            --dir "$RUNNER_TEMP"
+
+          cd "$RUNNER_TEMP"
+          sha256sum --check "$archive.sha256"
+          tar -xJf "$archive" -C "$toolchain"
+
+          echo "OPTIONAL_CLANG_ROOT=$toolchain" >> "$GITHUB_ENV"
+          echo "$toolchain/bin" >> "$GITHUB_PATH"
+
+      - name: Verify toolchain
+        shell: bash
+        run: |
+          test "$(command -v clang)" = "$OPTIONAL_CLANG_ROOT/bin/clang"
+          clang --version
+
+          cat > "$RUNNER_TEMP/optional-smoke-test.c" <<'EOF'
+          int value_or_zero(_Optional int *value) {
+            return value ? *value : 0;
+          }
+          EOF
+
+          clang -std=c99 \
+            -fsyntax-only \
+            "$RUNNER_TEMP/optional-smoke-test.c"
+
+      - name: Configure with _Optional
+        shell: bash
+        run: |
+          cmake \
+            -S "$GITHUB_WORKSPACE" \
+            -B "$GITHUB_WORKSPACE/build-optional" \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_COMPILER="$OPTIONAL_CLANG_ROOT/bin/clang" \
+            -DCMAKE_C_FLAGS=-DUSE_OPTIONAL \
+            -DBUILD_TESTING=ON
+
+      - name: Build
+        shell: bash
+        run: |
+          cmake \
+            --build "$GITHUB_WORKSPACE/build-optional" \
+            --parallel 2
+
+      - name: Test
+        shell: bash
+        run: |
+          ctest \
+            --test-dir "$GITHUB_WORKSPACE/build-optional" \
+            --build-config Debug \
+            --output-on-failure
