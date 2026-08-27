@@ -35,6 +35,9 @@ History:
                   every ISO C function that opens a stream.
   CJB: 26-Aug-26: Moved this interface from CBDebugLib to Fortify and renamed
                   its exported functions with the Fortify_ prefix.
+  CJB: 27-Aug-26: Define more FORTIFY_INTERCEPTED_... macros to prevent problems
+                  such as an unrecognized FILE * because fopen was redefined
+                  by another header.
 */
 
 #ifndef FortifyIO_h
@@ -49,51 +52,67 @@ History:
 
 #ifdef FORTIFY
 
+#define FORTIFY_INTERCEPTED_FOPEN
 #define fopen(filename, mode) \
           Fortify_fopen(filename, mode, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FREOPEN
 #define freopen(filename, mode, stream) \
           Fortify_freopen(filename, mode, stream, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_TMPFILE
 #define tmpfile() \
           Fortify_tmpfile(__FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_REWIND
 #define rewind(stream) \
           Fortify_rewind(stream, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FSEEK
 #define fseek(stream, offset, whence) \
           Fortify_fseek(stream, offset, whence, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FTELL
 #define ftell(stream) \
           Fortify_ftell(stream, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FCLOSE
 #define fclose(stream) \
           Fortify_fclose(stream, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FWRITE
 #define fwrite(ptr, size, nmemb, stream) \
           Fortify_fwrite(ptr, size, nmemb, stream, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FREAD
 #define fread(ptr, size, nmemb, stream) \
           Fortify_fread(ptr, size, nmemb, stream, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FPUTS
 #define fputs(s, stream) \
           Fortify_fputs(s, stream, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_PUTS
 #define puts(s) \
           Fortify_puts(s, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FPRINTF
 #define fprintf(stream, ...) \
           Fortify_fprintf(stream, __FILE__, __LINE__, __VA_ARGS__)
 
+#define FORTIFY_INTERCEPTED_FGETC
 #define fgetc(stream) \
           Fortify_fgetc(stream, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FPUTC
 #define fputc(c, stream) \
           Fortify_fputc(c, stream, __FILE__, __LINE__)
 
+#define FORTIFY_INTERCEPTED_FERROR
 #define ferror(stream) \
           Fortify_ferror(stream)
 
+#define FORTIFY_INTERCEPTED_CLEARERR
 #define clearerr(stream) \
           Fortify_clearerr(stream)
 
