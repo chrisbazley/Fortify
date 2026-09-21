@@ -16,13 +16,9 @@ static void capture_output(const char *string)
 
 int main(void)
 {
-    _Optional void *first;
-    _Optional void *second;
-    _Optional char *string;
-    int old_rate;
 
     Fortify_SetNumAllocationsLimit(0);
-    string = strdup("test");
+    _Optional char *string = strdup("test");
     assert(string == NULL);
 
     Fortify_SetNumAllocationsLimit(ULONG_MAX);
@@ -36,7 +32,7 @@ int main(void)
     assert(strcmp(&*string, "test") == 0);
     Fortify_free_sized(string, 5, __FILE__, __LINE__);
 
-    first = Fortify_aligned_alloc(sizeof(double), sizeof(double),
+    _Optional void *first = Fortify_aligned_alloc(sizeof(double), sizeof(double),
                                   __FILE__, __LINE__);
     assert(first != NULL);
     Fortify_free_aligned_sized(first, sizeof(double), sizeof(double),
@@ -48,7 +44,7 @@ int main(void)
 
     Fortify_SetNumAllocationsLimit(1);
     first = malloc(1);
-    second = malloc(1);
+    _Optional void *second = malloc(1);
     assert(first != NULL);
     assert(second == NULL);
     free(first);
@@ -66,7 +62,7 @@ int main(void)
     free(first);
 
     Fortify_SetNumAllocationsLimit(ULONG_MAX);
-    old_rate = Fortify_SetFailRate(100);
+    int old_rate = Fortify_SetFailRate(100);
 #ifdef FORTIFY_WARN_ON_FALSE_FAIL
     {
         Fortify_OutputFuncPtr old_output = Fortify_SetOutputFunc(capture_output);
