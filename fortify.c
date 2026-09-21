@@ -40,12 +40,11 @@ _Optional char *Fortify_strndup(const char *string, size_t max_len,
                                 const char *file, unsigned long line)
 {
     size_t len = 0;
-    _Optional char *copy;
 
     while (len < max_len && string[len] != '\0')
         ++len;
 
-    copy = Fortify_Allocate(len + 1, Fortify_Allocator_strdup, file, line);
+    _Optional char *copy = Fortify_Allocate(len + 1, Fortify_Allocator_strdup, file, line);
     if (copy != NULL) {
         char *const dest = &*copy;
 

@@ -32,6 +32,7 @@
   CJB: 26-Aug-26: Moved this implementation from CBDebugLib to Fortify,
                   removed its dependency on CBDebugLib headers and renamed
                   its exported functions with the Fortify_ prefix.
+  CJB: 21-Sep-26: Declare variables when they are first assigned.
 */
 
 #undef FORTIFY /* Prevent macro redirection of IO function calls to
@@ -297,13 +298,12 @@ long Fortify_ftell(FILE *stream, const char *file, unsigned long line)
 
 int Fortify_fclose(FILE *stream, const char *file, unsigned long line)
 {
-  int err;
   assert(stream);
   (void)get_stream_state(stream);
   /* Close the file even if simulating failure, to prevent leakage of
      file handles. */
   remove_stream(stream);
-  err = fclose(stream);
+  int err = fclose(stream);
   if (!io_succeeds(file, line))
   {
     errno = ERANGE;
