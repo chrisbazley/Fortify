@@ -37,6 +37,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_C_COMPILER="${{ matrix.c_compiler }}"
           -DBUILD_TESTING=ON
+          -DWARNINGS_AS_ERRORS=ON
 
       - name: Build
         run: >
@@ -111,7 +112,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_C_COMPILER="$OPTIONAL_CLANG_ROOT/bin/clang" \
             -DCMAKE_C_FLAGS=-DUSE_OPTIONAL \
-            -DBUILD_TESTING=ON
+            -DBUILD_TESTING=ON \
+            -DWARNINGS_AS_ERRORS=ON
 
       - name: Build
         shell: bash

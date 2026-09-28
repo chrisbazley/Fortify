@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(Fortify VERSION 2.2 LANGUAGES C)
 
+option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
+
 include(CTest)
 
 add_library(Fortify STATIC
@@ -46,6 +48,16 @@ set_target_properties(Fortify PROPERTIES
     DEBUG_POSTFIX dbg
 )
 
+# The original Fortify 2.2 source deliberately retains its historical C API
+# and 32-bit accounting types. Suppress only the diagnostics inherent in that
+# imported implementation, so that other warnings can be made fatal.
+if(MSVC)
+    target_compile_definitions(Fortify PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_compile_options(Fortify PRIVATE /wd4267 /wd4477)
+else()
+    target_compile_options(Fortify PRIVATE -Wno-format-security)
+endif()
+
 if(BUILD_TESTING)
     add_executable(FortifyTest tests/FortifyTest.c)
     target_link_libraries(FortifyTest PRIVATE Fortify)
@@ -54,4 +66,21 @@ if(BUILD_TESTING)
     add_executable(FortifyIOTest tests/FortifyIOTest.c)
     target_link_libraries(FortifyIOTest PRIVATE Fortify)
     add_test(NAME FortifyIOTest COMMAND FortifyIOTest)
+endif()
+
+if(WARNINGS_AS_ERRORS AND CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    if(MSVC)
+        target_compile_options(Fortify PRIVATE /WX)
+    else()
+        target_compile_options(Fortify PRIVATE -Werror)
+    endif()
+    if(BUILD_TESTING)
+        if(MSVC)
+            target_compile_options(FortifyTest PRIVATE /WX /wd4996)
+            target_compile_options(FortifyIOTest PRIVATE /WX)
+        else()
+            target_compile_options(FortifyTest PRIVATE -Werror)
+            target_compile_options(FortifyIOTest PRIVATE -Werror)
+        endif()
+    endif()
 endif()
