@@ -58,7 +58,8 @@ else()
     target_compile_options(Fortify PRIVATE -Wno-format-security)
 endif()
 
-if(BUILD_TESTING)
+# Dependency builds use the library without building its test suite.
+if(BUILD_TESTING AND CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     add_executable(FortifyTest tests/FortifyTest.c)
     target_link_libraries(FortifyTest PRIVATE Fortify)
     add_test(NAME FortifyTest COMMAND FortifyTest)
