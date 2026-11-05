@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(Fortify VERSION 2.2 LANGUAGES C)
 
+option(USE_OPTIONAL "Enable the _Optional qualifier" OFF)
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
 include(CTest)
@@ -31,10 +32,27 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     )
 endif()
 
+# The preserved Fortify 2.2 implementation has no _Optional annotations.
+# Keep checking the maintained wrappers and tests when these warnings are enabled.
+if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+    include(CheckCCompilerFlag)
+    foreach(warning null-to-nonoptional implicit-null-initialization)
+        check_c_compiler_flag("-W${warning}" "FORTIFY_HAS_${warning}")
+        if(FORTIFY_HAS_${warning})
+            set_property(SOURCE original/FORTIFY.CXX APPEND PROPERTY
+                COMPILE_OPTIONS "-Wno-${warning}")
+        endif()
+    endforeach()
+endif()
+
 target_compile_definitions(Fortify
     PRIVATE FORTIFY
     INTERFACE FORTIFY
 )
+
+if(USE_OPTIONAL)
+    target_compile_definitions(Fortify PRIVATE USE_OPTIONAL)
+endif()
 
 target_include_directories(Fortify
     PUBLIC
@@ -67,6 +85,11 @@ if(BUILD_TESTING AND CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     add_executable(FortifyIOTest tests/FortifyIOTest.c)
     target_link_libraries(FortifyIOTest PRIVATE Fortify)
     add_test(NAME FortifyIOTest COMMAND FortifyIOTest)
+
+    if(USE_OPTIONAL)
+        target_compile_definitions(FortifyTest PRIVATE USE_OPTIONAL)
+        target_compile_definitions(FortifyIOTest PRIVATE USE_OPTIONAL)
+    endif()
 endif()
 
 if(WARNINGS_AS_ERRORS AND CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
