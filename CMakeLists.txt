@@ -26,7 +26,7 @@ set_source_files_properties(original/FORTIFY.CXX PROPERTIES
 
 # LANGUAGE C selects the C compiler and C language flags, but GCC and Clang
 # still infer C++ from the original file's .CXX suffix unless told otherwise.
-if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|TinyCC")
     set_property(SOURCE original/FORTIFY.CXX APPEND_STRING PROPERTY
         COMPILE_FLAGS " -x c"
     )
