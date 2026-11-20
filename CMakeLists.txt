@@ -34,7 +34,7 @@ endif()
 
 # The preserved Fortify 2.2 implementation has no _Optional annotations.
 # Keep checking the maintained wrappers and tests when these warnings are enabled.
-if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+if(CMAKE_C_COMPILER_ID MATCHES "Clang|TinyCC")
     include(CheckCCompilerFlag)
     foreach(warning null-to-nonoptional implicit-null-initialization)
         check_c_compiler_flag("-W${warning}" "FORTIFY_HAS_${warning}")
